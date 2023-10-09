@@ -5,4 +5,4 @@ https://animixplay.to/
 http://anix.to/
 https://myanimelist.net/
 https://anilist.co/
-https://docs.consumet.org/``
+https://docs.consumet.org/
