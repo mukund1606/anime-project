@@ -1,4 +1,4 @@
-from livechart import LiveChart
+from utils.livechart import LiveChart
 from fastapi import FastAPI
 
 liveChart = LiveChart()

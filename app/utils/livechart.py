@@ -8,6 +8,9 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 import time
+import datetime
+
+from utils.browser import Browser
 
 
 class LiveChart:
@@ -15,47 +18,28 @@ class LiveChart:
     TIMETABLE_URL = "https://www.livechart.me/timetable"
 
     def __init__(self) -> None:
-        self.home_page_data = None
-        self.chrome_options = ChromeOptions()
-        self.chrome_options.add_experimental_option(
-            "excludeSwitches", ["enable-logging"]
-        )
-        self.chrome_options.add_argument("--no-sandbox")
-        self.chrome_options.add_argument("--disable-dev-shm-usage")
-        self.chrome_options.add_argument("--headless")
-        self.chrome_options.add_experimental_option("detach", True)
-        self.chrome_service = ChromeService(ChromeDriverManager().install())
-        self.available_browser = "chrome"
-        self.driver = webdriver.Chrome(
-            service=self.chrome_service, options=self.chrome_options
-        )
-        # self.driver = webdriver.Remote(
-        #     "http://127.0.0.1:4444/wd/hub", options=self.chrome_options
-        # )
-
-    def scrape_home(self) -> list | None:
-        try:
-            if self.home_page_data is None:
-                self.wait = WebDriverWait(self.driver, 100)
-                self.driver.get(self.BASE_URL)
-                self.driver.implicitly_wait(100)
-                self.home_page_data = self.driver.page_source
-            soup = BeautifulSoup(self.home_page_data, "html.parser")
-            divs = soup.find_all("div", class_="anime-card")
-            return divs
-        except Exception as e:
-            return None
-        finally:
-            self.driver.quit()
+        self.date = None
+        self.timetablePage = None
+        self.borwser = Browser()
 
     def timetable(self) -> list | None:
-        # try:
-        if self.home_page_data is None:
-            self.wait = WebDriverWait(self.driver, 100)
-            self.driver.get(self.TIMETABLE_URL + "?time_zone=UTC")
-            self.driver.implicitly_wait(100)
-            self.home_page_data = self.driver.page_source
-        soup = BeautifulSoup(self.home_page_data, "html.parser")
+        date = time.strftime(
+            "%Y-%m-%d",
+            time.gmtime(
+                datetime.datetime.now(datetime.timezone.utc)
+                .replace(tzinfo=datetime.timezone.utc)
+                .timestamp()
+            ),
+        )
+        if self.date == None or self.date != date or self.timetablePage == None:
+            self.wait = WebDriverWait(self.borwser.driver, 100)
+            self.borwser.driver.get(
+                self.TIMETABLE_URL + "?time_zone=UTC" + "&date=" + date
+            )
+            self.borwser.driver.implicitly_wait(100)
+            self.timetablePage = self.borwser.driver.page_source
+            self.date = date
+        soup = BeautifulSoup(self.timetablePage, "html.parser")
         animeList = []
         date_wise_anime = {}
         divs = soup.find_all(
