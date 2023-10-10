@@ -20,17 +20,18 @@ class LiveChart:
         self.chrome_options.add_experimental_option(
             "excludeSwitches", ["enable-logging"]
         )
+        self.chrome_options.add_argument("--no-sandbox")
+        self.chrome_options.add_argument("--disable-dev-shm-usage")
         self.chrome_options.add_argument("--headless")
         self.chrome_options.add_experimental_option("detach", True)
         self.chrome_service = ChromeService(ChromeDriverManager().install())
-        self.driver = webdriver.Chrome(
-            service=self.chrome_service, options=self.chrome_options
-        )
-        self.driver.quit()
         self.available_browser = "chrome"
         self.driver = webdriver.Chrome(
             service=self.chrome_service, options=self.chrome_options
         )
+        # self.driver = webdriver.Remote(
+        #     "http://127.0.0.1:4444/wd/hub", options=self.chrome_options
+        # )
 
     def scrape_home(self) -> list | None:
         try:
