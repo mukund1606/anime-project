@@ -34,4 +34,4 @@ COPY ./app /code/app
 
 # 
 # CMD ["uvicorn", "app.main:app"]
-CMD [ "python", "app/main.py" ]
+CMD [ "uvicorn", "app.api:app", "--port", "8000"]

@@ -10,7 +10,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 import time
 import datetime
 
-from utils.browser import Browser
+from app.utils.browser import Browser
 
 
 class LiveChart:
