@@ -1,16 +1,8 @@
-from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
 from bs4 import BeautifulSoup
-
-# Chrome
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.chrome.options import Options as ChromeOptions
+import requests
 
 import time
 import datetime
-
-from app.utils.browser import Browser
 
 
 class LiveChart:
@@ -20,9 +12,10 @@ class LiveChart:
     def __init__(self) -> None:
         self.date = None
         self.timetablePage = None
-        self.borwser = Browser()
+        self.session = requests.Session()
+        self.session.headers["User-Agent"] = "Mozilla/5.0"
 
-    def timetable(self) -> list | None:
+    def timetable(self) -> list:
         date = time.strftime(
             "%Y-%m-%d",
             time.gmtime(
@@ -32,12 +25,9 @@ class LiveChart:
             ),
         )
         if self.date == None or self.date != date or self.timetablePage == None:
-            self.wait = WebDriverWait(self.borwser.driver, 100)
-            self.borwser.driver.get(
+            self.timetablePage = self.session.get(
                 self.TIMETABLE_URL + "?time_zone=UTC" + "&date=" + date
-            )
-            self.borwser.driver.implicitly_wait(100)
-            self.timetablePage = self.borwser.driver.page_source
+            ).text
             self.date = date
         soup = BeautifulSoup(self.timetablePage, "html.parser")
         animeList = []

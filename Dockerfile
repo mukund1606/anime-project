@@ -1,11 +1,11 @@
 # 
-FROM python:3.11
+FROM python:3.11-alpine
 
 # Install Chrome
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-RUN apt-get -y update
-RUN apt-get install -y google-chrome-stable
+# RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+# RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+# RUN apt-get -y update
+# RUN apt-get install -y google-chrome-stable
 
 # # Installing Unzip
 # RUN apt-get install -yqq unzip
@@ -30,8 +30,10 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 
 # 
-COPY ./app /code/app
+COPY ./server /code/server
+COPY ./utils /code/utils
+COPY ./main.py /code/main.py
 
 # 
-# CMD ["uvicorn", "app.main:app"]
-CMD [ "uvicorn", "app.api:app", "--port", "8000"]
+# CMD [ "uvicorn", "server.api:app", "--port", "8000"]
+CMD [ "python", "main.py"]
