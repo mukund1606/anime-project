@@ -36,31 +36,42 @@ class LiveChart:
         self.timetable_page = self.session.get(self.TIMETABLE_URL).text
         self.date = date
         soup = BeautifulSoup(self.timetable_page, "html.parser")
-        anime_list = []
         date_wise_anime = {}
-        divs = soup.find_all(
-            "div", class_="timetable-timeslot", attrs={"data-timestamp": True}
+        container = soup.find("div", class_="timetable")
+        days = container.find_all(
+            "div", class_="timetable-day", attrs={"data-controller": "timetable-day"}
         )
-        for animes_div in divs:
-            timestamp = animes_div["data-timestamp"]
-            all_animes = animes_div.find_all("div", class_="timetable-anime-block")
-            for anime in all_animes:
-                anime_name = anime.find("a", class_="title")["title"]
-                anime_id = anime.find("a", class_="title")["href"].split("/")[-1]
-                episode = anime.find("div", class_="footer").text.split()
-                anime_list.append(
-                    {
-                        "name": anime_name,
-                        "id": anime_id,
-                        "episode": episode[0],
-                        "premiere_time": timestamp,
-                    }
-                )
-        for anime in anime_list:
-            if anime["date_data"]["date"] not in date_wise_anime:
-                date_wise_anime[anime["date_data"]["date"]] = []
-            date_wise_anime[anime["date_data"]["date"]].append(anime)
-        print(len(anime_list))
+        for day_div in days:
+            anime_list = []
+            date_timestamp = day_div.attrs.get("data-timetable-day-start")
+            date = time.strftime("%d %B %Y", time.gmtime(int(date_timestamp)))
+            divs = day_div.find_all(
+                "div", class_="timetable-timeslot", attrs={"data-timestamp": True}
+            )
+            for animes_div in divs:
+                timestamp = animes_div["data-timestamp"]
+                anime_time = time.strftime("%H:%M", time.gmtime(int(timestamp)))
+                anime_day = time.strftime("%A", time.gmtime(int(timestamp)))
+                date = time.strftime("%d %B %Y", time.gmtime(int(timestamp)))
+                all_animes = animes_div.find_all("div", class_="timetable-anime-block")
+                for anime in all_animes:
+                    anime_name = anime.find("a", class_="title")["title"]
+                    anime_id = anime.find("a", class_="title")["href"].split("/")[-1]
+                    episode = anime.find("div", class_="footer").text.split()
+                    anime_list.append(
+                        {
+                            "name": anime_name,
+                            "id": anime_id,
+                            "episode": episode[0],
+                            "premiere_time": timestamp,
+                            "date_data": {
+                                "date": date,
+                                "time": anime_time,
+                                "day": anime_day,
+                            },
+                        }
+                    )
+                date_wise_anime[date] = anime_list
         return date_wise_anime
 
     def anime_data(self, anime_id) -> list:
