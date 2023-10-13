@@ -2,8 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 
 import time
-import datetime
-import re
 
 
 class LiveChart:
@@ -23,7 +21,10 @@ class LiveChart:
         self.session.cookies.set("default_season", "nearest")
 
     def timetable(self) -> list:
-        timetable_page = self.session.get(self.TIMETABLE_URL).text
+        page = self.session.get(self.TIMETABLE_URL)
+        if page.status_code != 200:
+            raise Exception("LiveChart is down")
+        timetable_page = page.text
         soup = BeautifulSoup(timetable_page, "html.parser")
         date_wise_anime = {}
         container = soup.find("div", class_="timetable")
@@ -56,8 +57,11 @@ class LiveChart:
         return date_wise_anime
 
     def anime_data(self, anime_id) -> list:
+        page = self.session.get(self.ANIME_URL + anime_id)
+        if page.status_code != 200:
+            raise Exception("LiveChart is down")
+        page = page.text
         studio = None
-        page = self.session.get(self.ANIME_URL + anime_id).text
         soup = BeautifulSoup(page, "html.parser")
         container_div = soup.find_all("div", class_="grow w-0")[0]
         title_div = container_div("div", class_="grow")[0]
@@ -83,7 +87,10 @@ class LiveChart:
         }
 
     def schedule(self) -> list:
-        schedule_page = self.session.get(self.SCHEDULE_URL).text
+        page = self.session.get(self.SCHEDULE_URL)
+        if page.status_code != 200:
+            raise Exception("LiveChart is down")
+        schedule_page = page.text
         soup = BeautifulSoup(schedule_page, "html.parser")
         schedule_div = soup.find("div", class_="container")
         all_dates = schedule_div.find_all("h4", class_="schedule-heading")
