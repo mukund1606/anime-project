@@ -13,8 +13,6 @@ class LiveChart:
     SCHEDULE_URL = "https://www.livechart.me/schedule/all"
 
     def __init__(self) -> None:
-        self.date = None
-        self.timetable_page = None
         self.session = requests.Session()
         self.session.headers["User-Agent"] = "Mozilla/5.0"
         self.session.cookies.set("schedule_layout", "full")
@@ -25,17 +23,8 @@ class LiveChart:
         self.session.cookies.set("default_season", "nearest")
 
     def timetable(self) -> list:
-        date = time.strftime(
-            "%Y-%m-%d",
-            time.gmtime(
-                datetime.datetime.now(datetime.timezone.utc)
-                .replace(tzinfo=datetime.timezone.utc)
-                .timestamp()
-            ),
-        )
-        self.timetable_page = self.session.get(self.TIMETABLE_URL).text
-        self.date = date
-        soup = BeautifulSoup(self.timetable_page, "html.parser")
+        timetable_page = self.session.get(self.TIMETABLE_URL).text
+        soup = BeautifulSoup(timetable_page, "html.parser")
         date_wise_anime = {}
         container = soup.find("div", class_="timetable")
         days = container.find_all(
@@ -50,9 +39,6 @@ class LiveChart:
             )
             for animes_div in divs:
                 timestamp = animes_div["data-timestamp"]
-                anime_time = time.strftime("%H:%M", time.gmtime(int(timestamp)))
-                anime_day = time.strftime("%A", time.gmtime(int(timestamp)))
-                date = time.strftime("%d %B %Y", time.gmtime(int(timestamp)))
                 all_animes = animes_div.find_all("div", class_="timetable-anime-block")
                 for anime in all_animes:
                     anime_name = anime.find("a", class_="title")["title"]
@@ -64,11 +50,6 @@ class LiveChart:
                             "id": anime_id,
                             "episode": episode[0],
                             "premiere_time": timestamp,
-                            "date_data": {
-                                "date": date,
-                                "time": anime_time,
-                                "day": anime_day,
-                            },
                         }
                     )
                 date_wise_anime[date] = anime_list
