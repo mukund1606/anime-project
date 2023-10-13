@@ -7,7 +7,7 @@ liveChart = LiveChart()
 
 headers = {
     "Access-Control-Allow-Origin": "*",
-    "Cache-Control": "s-maxage=30, stale-while-revalidate",
+    "Cache-Control": "maxage=30, s-maxage=30, stale-while-revalidate",
 }
 
 
