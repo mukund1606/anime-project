@@ -14,6 +14,7 @@ class AnimeData(BaseModel):
     native_title: str
     alternate_titles: list[str]
     premiere_timestamp: int
+    episode: str
     main_title: str
     genres: list[str]
     studio: list[str]

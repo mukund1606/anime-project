@@ -3,6 +3,7 @@ import requests
 
 import time
 
+
 class LiveChart:
     BASE_URL = "https://www.livechart.me/"
     TIMETABLE_URL = "https://www.livechart.me/timetable"
@@ -316,7 +317,7 @@ class LiveChart:
                         "anime-planet",
                         "anisearch",
                         "kitsu",
-                        "website"
+                        "website",
                     ]
                     # Check and store specific link types
                     for elem_class in class_list:
@@ -330,6 +331,10 @@ class LiveChart:
 
                 # Extract poster images
                 poster_div = anime_container.find("div", class_="poster-container")
+                anime_episode = poster_div.find("time", attrs={"data-label": True})
+                anime_data["episode"] = (
+                    anime_episode.attrs.get("data-label") if anime_episode else ""
+                )
                 image = poster_div.find("img")
                 image_attrs = image.attrs
                 anime_data["posters"] = [
