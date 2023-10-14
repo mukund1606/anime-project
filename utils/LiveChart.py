@@ -3,14 +3,13 @@ import requests
 
 import time
 
-
 class LiveChart:
     BASE_URL = "https://www.livechart.me/"
     TIMETABLE_URL = "https://www.livechart.me/timetable"
     ANIME_URL = "https://www.livechart.me/anime/"  # + animeId
     SCHEDULE_URL = "https://www.livechart.me/schedule/all"
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.session = requests.Session()
         self.session.headers["User-Agent"] = "Mozilla/5.0"
         self.session.cookies.set("schedule_layout", "full")
@@ -20,43 +19,43 @@ class LiveChart:
         )
         self.session.cookies.set("default_season", "nearest")
 
-    def timetable(self) -> list:
-        page = self.session.get(self.TIMETABLE_URL)
-        if page.status_code != 200:
-            raise Exception("LiveChart is down")
-        timetable_page = page.text
-        soup = BeautifulSoup(timetable_page, "html.parser")
-        date_wise_anime = {}
-        container = soup.find("div", class_="timetable")
-        days = container.find_all(
-            "div", class_="timetable-day", attrs={"data-controller": "timetable-day"}
-        )
-        for day_div in days:
-            anime_list = []
-            date_timestamp = day_div.attrs.get("data-timetable-day-start")
-            date = time.strftime("%d %B %Y", time.gmtime(int(date_timestamp)))
-            divs = day_div.find_all(
-                "div", class_="timetable-timeslot", attrs={"data-timestamp": True}
-            )
-            for animes_div in divs:
-                timestamp = animes_div["data-timestamp"]
-                all_animes = animes_div.find_all("div", class_="timetable-anime-block")
-                for anime in all_animes:
-                    anime_name = anime.find("a", class_="title")["title"]
-                    anime_id = anime.find("a", class_="title")["href"].split("/")[-1]
-                    episode = anime.find("div", class_="footer").text.split()
-                    anime_list.append(
-                        {
-                            "name": anime_name,
-                            "id": anime_id,
-                            "episode": episode[0],
-                            "premiere_time": timestamp,
-                        }
-                    )
-                date_wise_anime[date] = anime_list
-        return date_wise_anime
+    # def timetable(self):
+    #     page = self.session.get(self.TIMETABLE_URL)
+    #     if page.status_code != 200:
+    #         raise Exception("LiveChart is down")
+    #     timetable_page = page.text
+    #     soup = BeautifulSoup(timetable_page, "html.parser")
+    #     date_wise_anime = {}
+    #     container = soup.find("div", class_="timetable")
+    #     days = container.find_all(
+    #         "div", class_="timetable-day", attrs={"data-controller": "timetable-day"}
+    #     )
+    #     for day_div in days:
+    #         anime_list = []
+    #         date_timestamp = day_div.attrs.get("data-timetable-day-start")
+    #         date = time.strftime("%d %B %Y", time.gmtime(int(date_timestamp)))
+    #         divs = day_div.find_all(
+    #             "div", class_="timetable-timeslot", attrs={"data-timestamp": True}
+    #         )
+    #         for animes_div in divs:
+    #             timestamp = animes_div["data-timestamp"]
+    #             all_animes = animes_div.find_all("div", class_="timetable-anime-block")
+    #             for anime in all_animes:
+    #                 anime_name = anime.find("a", class_="title")["title"]
+    #                 anime_id = anime.find("a", class_="title")["href"].split("/")[-1]
+    #                 episode = anime.find("div", class_="footer").text.split()
+    #                 anime_list.append(
+    #                     {
+    #                         "name": anime_name,
+    #                         "id": anime_id,
+    #                         "episode": episode[0],
+    #                         "premiere_time": timestamp,
+    #                     }
+    #                 )
+    #             date_wise_anime[date] = anime_list
+    #     return date_wise_anime
 
-    def anime_data(self, anime_id) -> list:
+    def anime_data(self, anime_id):
         anime_info = {}
         page = self.session.get(self.ANIME_URL + anime_id)
         if page.status_code != 200:
@@ -188,7 +187,7 @@ class LiveChart:
                 tags = []
 
             anime_data = {
-                "format": anime_format,
+                "anime_format": anime_format,
                 "source": source,
                 "episodes": episodes,
                 "run_time": run_time,
@@ -245,7 +244,7 @@ class LiveChart:
 
         return anime_info
 
-    def schedule(self) -> list:
+    def schedule(self):
         page = self.session.get(self.SCHEDULE_URL)
         if page.status_code != 200:
             raise Exception("LiveChart is down")
@@ -310,19 +309,24 @@ class LiveChart:
                 for link in related_links:
                     class_name = link.get("class")[0].replace("-icon", "")
                     link_url = link.get("href")
-
-                    # Check and store specific link types
-                    if class_name in [
+                    class_list = [
                         "anilist",
                         "mal",
                         "anidb",
                         "anime-planet",
                         "anisearch",
                         "kitsu",
-                    ]:
-                        anime_data[class_name + "_id"] = link_url.split("/")[-1]
-                    elif class_name == "website":
-                        anime_data["website"] = link_url
+                        "website"
+                    ]
+                    # Check and store specific link types
+                    for elem_class in class_list:
+                        if class_name in class_list:
+                            if class_name != "website":
+                                anime_data[class_name + "_id"] = link_url.split("/")[-1]
+                            else:
+                                anime_data[class_name] = link_url
+                        else:
+                            anime_data[class_name + "_id"] = None
 
                 # Extract poster images
                 poster_div = anime_container.find("div", class_="poster-container")
@@ -336,4 +340,4 @@ class LiveChart:
                 articles_data.append(anime_data)
 
             schedule_data[elem.text] = articles_data
-            return schedule_data
+        return schedule_data
