@@ -16,7 +16,7 @@ class LiveChart:
         self.session.cookies.set("schedule_layout", "full")
         self.session.cookies.set(
             "preferences",
-            "%7B%22sortby%22%3A%22airdate%22%2C%22time_zone%22%3A%22Etc%2FUTC%22%2C%22titles%22%3A%22romaji%22%2C%22ongoing%22%3A%22all%22%2C%22schedule_start%22%3A%22today%22%2C%22use_24h_clock%22%3Atrue%2C%22night_mode%22%3Atrue%2C%22reveal_spoilers%22%3Atrue%7D",
+            "%7B%22sortby%22%3A%22airdate%22%2C%22time_zone%22%3A%22Etc%2FUTC%22%2C%22titles%22%3A%22romaji%22%2C%22ongoing%22%3A%22all%22%2C%22schedule_start%22%3A%22yesterday%22%2C%22use_24h_clock%22%3Atrue%2C%22night_mode%22%3Atrue%2C%22reveal_spoilers%22%3Atrue%7D",
         )
         self.session.cookies.set("default_season", "nearest")
 
