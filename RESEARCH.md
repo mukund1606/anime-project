@@ -7,6 +7,11 @@ https://myanimelist.net/
 https://anilist.co/
 https://docs.consumet.org/
 
+anilistGraphqlUrl = "https://graphql.anilist.co"
+kitsuGraphqlUrl = "https://kitsu.io/api/graphql"
+malSyncUrl = "https://api.malsync.moe"
+enimeUrl = "https://api.enime.moe"
+
 Kenja no mago
 Livechart ID -> 2891 (https://www.livechart.me/anime/2891)
 Chiaki ID -> 36407 (https://chiaki.site/?/tools/watch_order/id/36407)
