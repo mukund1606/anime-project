@@ -41,11 +41,11 @@ async def live_anime(anime_id: str, response: Response) -> AnimeInfo:
 async def live_anime_schedule(
     response: Response,
 ) -> dict[str, list[AnimeData]]:
-    try:
-        content = liveChart.schedule()
-        return JSONResponse(content=content, headers=headers)
-    except Exception as e:
-        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
-        return JSONResponse(
-            content={"message": "LiveChart is down"}, headers=headers, status_code=503
-        )
+    # try:
+    content = liveChart.schedule()
+    return JSONResponse(content=content, headers=headers)
+    # except Exception as e:
+    #     response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    #     return JSONResponse(
+    #         content={"message": "LiveChart is down"}, headers=headers, status_code=503
+    #     )

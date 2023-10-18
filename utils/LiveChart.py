@@ -71,11 +71,13 @@ class LiveChart:
 
         # Extract posters
         posters_element = container_div.find("div", class_="shrink-0")
+        image_data = posters_element.find("img").get("srcset")
         posters = (
-            [
-                src.strip().split(" ")[0]
-                for src in posters_element.find("img").get("srcset").split(",")
-            ]
+            (
+                [src.strip().split(" ")[0] for src in image_data.split(",")]
+                if image_data
+                else [posters_element.get("src")]
+            )
             if posters_element
             else []
         )
@@ -337,10 +339,12 @@ class LiveChart:
                 )
                 image = poster_div.find("img")
                 image_attrs = image.attrs
-                anime_data["posters"] = [
-                    src.strip().split(" ")[0]
-                    for src in image_attrs.get("srcset").split(",")
-                ]
+                image_data = image_attrs.get("srcset")
+                anime_data["posters"] = (
+                    [src.strip().split(" ")[0] for src in image_data.split(",")]
+                    if image_data
+                    else [image_attrs.get("src")]
+                )
 
                 articles_data.append(anime_data)
 
